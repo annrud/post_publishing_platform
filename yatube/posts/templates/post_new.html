@@ -1,0 +1,9 @@
+{% extends "post_form.html" %}
+{% block title %}Добавить запись{% endblock %}
+{% block form_title %}Добавить запись{% endblock %}
+{% block form_action %}{% url "new_post" %}{% endblock %}
+{% block form_submit %}
+    <button type="submit" class="btn btn-primary">
+        Добавить
+    </button>
+{% endblock %}

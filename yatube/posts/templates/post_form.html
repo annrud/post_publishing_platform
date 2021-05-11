@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{% endblock %}
+{% block content %}
+    {% load user_filters %}
+    <div class="row justify-content-center">
+        <div class="col-md-8 p-5">
+            <div class="card">
+                <div class="card-header">{% block form_title %}{% endblock %}</div>
+                <div class="card-body">
+                    {% for error in form.errors.values %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ error|escape }}
+                        </div>
+                    {% endfor %}
+                    <form method="post" action="{% block form_action %}{% endblock %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group row">
+                            <label for="{{ form.group.id_for_label }}" class="col-md-4 col-form-label text-md-right">{{ form.group.label }}</label>
+                            <div class="col-md-6">
+                                {{ form.group|addclass:"form-control" }}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="{{ form.text.id_for_label }}" class="col-md-4 col-form-label text-md-right">{{ form.text.label }}</label>
+                            <div class="col-md-6">
+                                {{ form.text|addclass:"form-control" }}
+                                <small>{{ form.text.help_text }}</small>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="{{ form.image.id_for_label }}" class="col-md-4 col-form-label text-md-right">{{ form.image.label }}</label>
+                            <div class="col-md-6">
+                                {{ form.image|addclass:"form-control" }}
+                                <small>{{ form.image.help_text }}</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 offset-md-4">
+                            {% block form_submit %}{% endblock %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

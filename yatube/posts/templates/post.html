@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+    <main role="main" class="container">
+        <div class="row">
+            <div class="col-md-3 mb-3 mt-1">
+                {% include "includes/post_author.html" with post_author=post.author post_count=post.author.posts.count %}
+            </div>
+            <div class="col-md-9">
+                {% include "includes/post_item.html" with post=post is_need_edit_button=True %}
+                {% include "includes/comments.html" %}
+            </div>
+        </div>
+    </main>
+{% endblock %}

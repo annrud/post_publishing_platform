@@ -1,0 +1,9 @@
+{% extends "post_form.html" %}
+{% block title %}Редактирование записи #{{ post.id }}{% endblock %}
+{% block form_title %}Редактирование записи #{{ post.id }}{% endblock %}
+{% block form_action %}{% url "post_edit" username=username post_id=post.id %}{% endblock %}
+{% block form_submit %}
+    <button type="submit" class="btn btn-primary">
+        Сохранить
+    </button>
+{% endblock %}

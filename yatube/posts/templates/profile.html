@@ -7,7 +7,7 @@
             </div>
             <div class="col-md-9">
                 {% for post in page %}
-                    {% include "includes/post_item.html" with post=post is_need_comment_button=True is_need_edit_button=True %}
+                    {% include "includes/post_item.html" with post=post is_need_view_button=True is_need_edit_button=True %}
                 {% endfor %}
                 {% include "includes/paginator.html" %}
             </div>

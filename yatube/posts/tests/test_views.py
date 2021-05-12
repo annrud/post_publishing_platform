@@ -75,6 +75,9 @@ class PostsPagesTests(TestCase):
                     kwargs={'slug': self.group.slug}): 'group.html',
             reverse('profile',
                     kwargs={'username': self.author.username}): 'profile.html',
+            reverse('post',
+                    kwargs={'username': self.author.username,
+                            'post_id': self.post.id}): 'post.html',
         }
         for address, template in templates_url_names.items():
             with self.subTest(address=address):
@@ -84,9 +87,6 @@ class PostsPagesTests(TestCase):
     def test_url_exists_and_uses_correct_template_for_authorized_client(self):
         """URL-адрес использует соответствующий шаблон."""
         templates_url_names = {
-            reverse('add_comment',
-                    kwargs={'username': self.author.username,
-                            'post_id': self.post.id}): 'post.html',
             reverse('new_post'): 'post_new.html',
             reverse('follow_index'): 'follow.html',
         }
@@ -107,7 +107,6 @@ class PostsPagesTests(TestCase):
     def test_index_shows_correct_context(self):
         """Шаблон index.html сформирован с правильным контекстом."""
         response = self.guest_client.get(reverse('index'))
-        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertIn('page', response.context)
         self.assertGreater(len(response.context['page']), 0)
         post = response.context['page'][0]
@@ -133,6 +132,7 @@ class PostsPagesTests(TestCase):
         self.assertEqual(group.slug, self.group.slug)
         self.assertEqual(group.description, self.group.description)
         self.assertEqual(post.text, self.post.text)
+        self.assertEqual(post.pub_date, self.post.pub_date)
         self.assertEqual(post.author, self.post.author)
         self.assertEqual(post.group, self.post.group)
         self.assertEqual(post.image, self.post.image)
@@ -153,9 +153,9 @@ class PostsPagesTests(TestCase):
         posts = response.context['page']
         self.assertNotIn(self.post, posts)
 
-    def test_post_new_shows_correct_context(self):
-        """Шаблон post_new.html
-         сформирован с правильным контекстом.
+    def test_post_new_shows_correct_form(self):
+        """Шаблон post_new.html выводит
+        правильную форму создания поста.
         """
         response = self.authorized_client.get(
             reverse('new_post')
@@ -183,37 +183,68 @@ class PostsPagesTests(TestCase):
         post_author = response.context['post_author']
         self.assertIsInstance(post_author, User)
         self.assertIn('following', response.context)
+        self.assertEqual(response.context['following'], None)
         self.assertIn('page', response.context)
         page = response.context['page']
         self.assertGreater(len(page), 0)
         post = page[0]
-        self.assertEqual(post_author, self.author)
         self.assertEqual(post.text, self.post.text)
+        self.assertEqual(post.pub_date, self.post.pub_date)
+        self.assertEqual(post_author, self.author)
         self.assertEqual(post.group, self.post.group)
         self.assertEqual(post.image, self.post.image)
         self.assertEqual(page.paginator.count, 1)
+        self.authorized_client.get(
+            reverse('profile_follow',
+                    kwargs={'username': self.author.username}))
+        response = self.authorized_client.get(
+            reverse('profile', kwargs={'username': self.author.username})
+        )
+        self.assertIn('following', response.context)
+        self.assertIsInstance(response.context['following'].first(), Follow)
 
-    def test_add_comment_shows_correct_context(self):
+    def test_post_shows_correct_context(self):
         """Шаблон post.html сформирован
          с правильным контекстом.
         """
-        response = self.authorized_client.get(
-            reverse('add_comment',
+        response = self.guest_client.get(
+            reverse('post',
                     kwargs={'username': self.author.username,
                             'post_id': self.post.id})
         )
-        self.assertIn('form', response.context)
-        self.assertIsInstance(response.context['form'], CommentForm)
-        form_field = response.context['form'].fields['text']
-        self.assertIsInstance(form_field, forms.fields.CharField)
         self.assertIn('post', response.context)
         post = response.context['post']
         self.assertIsInstance(post, Post)
-        self.assertEqual(post.author, self.author)
+        self.assertIn('form', response.context)
+        self.assertEqual(response.context['form'], None)
         self.assertEqual(post.text, self.post.text)
+        self.assertEqual(post.pub_date, self.post.pub_date)
+        self.assertEqual(post.author, self.author)
         self.assertEqual(post.group, self.post.group)
-        self.assertEqual(post.image, self.post.image)
         self.assertEqual(post.author.posts.count(), 1)
+        response = self.authorized_client.get(
+            reverse('post',
+                    kwargs={'username': self.author.username,
+                            'post_id': self.post.id})
+        )
+        self.assertIsInstance(response.context['form'], CommentForm)
+        form_field = response.context['form'].fields['text']
+        self.assertIsInstance(form_field, forms.fields.CharField)
+
+    def test_add_comment(self):
+        """В шаблон post.html добавляется комментарий.
+        """
+        comments_count = self.post.comments.count()
+        form_data = {'text': 'Это новый комментарий'}
+        response = self.authorized_client.post(
+            reverse('add_comment',
+                    kwargs={'username': self.author.username,
+                            'post_id': self.post.id}),
+            data=form_data,
+            follow=True
+        )
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertNotEqual(self.post.comments.count(), comments_count)
 
     def test_post_edit_shows_correct_context(self):
         """Шаблон post_edit.html
@@ -276,11 +307,13 @@ class PostsPagesTests(TestCase):
         self.assertIn('page', response.context)
         self.assertGreater(len(response.context['page']), 0)
         post = response.context['page'][0]
-        self.assertEqual(post.text, self.post.text)
         self.assertEqual(post.author, self.author)
+        self.assertEqual(post.text, self.post.text)
         self.assertEqual(post.pub_date, self.post.pub_date)
         self.assertEqual(post.group, self.group)
         self.assertEqual(post.image, self.post.image)
+        self.authorized_client.force_login(self.user)
         response = self.authorized_client.get(reverse('follow_index'))
         self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertIn('page', response.context)
         self.assertEqual(len(response.context['page']), 0)

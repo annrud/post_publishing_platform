@@ -47,6 +47,7 @@ class PostsURLTests(TestCase):
             '/': 'index.html',
             f'/group/{self.group.slug}/': 'group.html',
             f'/{self.author.username}/': 'profile.html',
+            f'/{self.author.username}/{self.post.id}/': 'post.html',
         }
         for address, template in templates_url_names.items():
             with self.subTest(address=address):
@@ -60,7 +61,6 @@ class PostsURLTests(TestCase):
         """
         templates_url_names = {
             '/new/': 'post_new.html',
-            f'/{self.author.username}/{self.post.id}/comment/': 'post.html',
             '/follow/': 'follow.html',
         }
         for address, template in templates_url_names.items():
@@ -108,7 +108,9 @@ class PostsURLTests(TestCase):
         """Страница верно перенаправит авторизованного пользователя."""
         url_names = {
             f'/{self.author.username}/{self.post.id}/edit/':
-                f'/{self.author.username}/{self.post.id}/comment/',
+                f'/{self.author.username}/{self.post.id}/',
+            f'/{self.author.username}/{self.post.id}/comment/':
+                f'/{self.author.username}/{self.post.id}/',
             f'/{self.author.username}/follow/': f'/{self.author.username}/',
             f'/{self.author.username}/unfollow/': f'/{self.author.username}/'
         }

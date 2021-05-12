@@ -75,7 +75,7 @@ class PostCreateFormTests(TestCase):
             Post.objects.filter(
                 text=form_data['text'],
                 group=form_data['group'],
-                image=f'media/{uploaded.name}'
+                image=f'posts/{uploaded.name}'
             ).exists()
         )
 
@@ -103,14 +103,14 @@ class PostCreateFormTests(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertEqual(Post.objects.count(), posts_count)
         self.assertRedirects(response, reverse(
-            'add_comment', kwargs={'username': self.author.username,
-                                   'post_id': self.post.id}
+            'post', kwargs={'username': self.author.username,
+                            'post_id': self.post.id}
         )
         )
         self.assertTrue(
             Post.objects.filter(
                 text=form_data['text'],
                 group=form_data['group'],
-                image=f'media/{uploaded.name}'
+                image=f'posts/{uploaded.name}'
             ).exists()
         )

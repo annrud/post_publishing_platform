@@ -79,13 +79,13 @@ def post_view(request, username, post_id):
         Post.objects.select_related('author').prefetch_related('comments'),
         pk=post_id, author__username=username
     )
-    form = CommentForm(
-        request.POST or None) if request.user.is_authenticated else None
+    form = CommentForm()
     return render(
         request,
         'post.html',
         {
             'post': post,
+            'comments': post.comments.all(),
             'form': form,
         }
     )

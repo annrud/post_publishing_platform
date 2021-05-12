@@ -216,7 +216,7 @@ class PostsPagesTests(TestCase):
         post = response.context['post']
         self.assertIsInstance(post, Post)
         self.assertIn('form', response.context)
-        self.assertEqual(response.context['form'], None)
+        self.assertIsInstance(response.context['form'], CommentForm)
         self.assertEqual(post.text, self.post.text)
         self.assertEqual(post.pub_date, self.post.pub_date)
         self.assertEqual(post.author, self.author)

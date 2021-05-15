@@ -31,7 +31,7 @@ class CacheTestCase(TestCase):
         """Неавторизованный пользователь"""
         self.guest_client = Client()
 
-    def test_cache(self):
+    def test_cache_index(self):
         response_1 = self.guest_client.get(reverse('index'))
         key = make_template_fragment_key('index_page')
         result = cache.get(key)

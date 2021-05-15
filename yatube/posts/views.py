@@ -1,6 +1,4 @@
 from django.contrib.auth.decorators import login_required
-from django.core.cache import cache
-from django.core.cache.utils import make_template_fragment_key
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -55,9 +53,10 @@ def profile(request, username):
     post_author = get_object_or_404(
         User, username=username
     )
-    following = Follow.objects.filter(
+    following = request.user.is_authenticated and Follow.objects.filter(
         author=post_author,
-        user=request.user) if request.user.is_authenticated else None
+        user=request.user
+    ).exists()
     post_list = post_author.posts.all()
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
@@ -79,6 +78,10 @@ def post_view(request, username, post_id):
         Post.objects.select_related('author').prefetch_related('comments'),
         pk=post_id, author__username=username
     )
+    following = request.user.is_authenticated and Follow.objects.filter(
+        author=post.author,
+        user=request.user
+    ).exists()
     form = CommentForm()
     return render(
         request,
@@ -87,6 +90,7 @@ def post_view(request, username, post_id):
             'post': post,
             'comments': post.comments.all(),
             'form': form,
+            'following': following,
         }
     )
 
@@ -130,7 +134,8 @@ def post_edit(request, username, post_id):
 @login_required
 def follow_index(request):
     posts = Post.objects.filter(
-        author__in=request.user.follower.values('author'))
+        author__following__user=request.user
+    )
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -138,7 +143,7 @@ def follow_index(request):
         request,
         'follow.html',
         {
-            'page': page
+            'page': page,
         }
     )
 
@@ -146,12 +151,10 @@ def follow_index(request):
 @login_required
 def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
-    if not Follow.objects.filter(
+    if author != request.user and not Follow.objects.filter(
             user=request.user,
-            author=author).exists() and author != request.user:
+            author=author).exists():
         Follow.objects.create(user=request.user, author=author)
-        cache.delete(make_template_fragment_key('follow_page',
-                                                [request.user.username]))
     return redirect(
         'profile', username=username
     )
@@ -159,12 +162,10 @@ def profile_follow(request, username):
 
 @login_required
 def profile_unfollow(request, username):
-    author = get_object_or_404(User, username=username)
-    follow = Follow.objects.filter(user=request.user, author=author)
+    follow = Follow.objects.filter(user=request.user,
+                                   author__username=username)
     if follow.exists():
         follow.delete()
-        cache.delete(make_template_fragment_key('follow_page',
-                                                [request.user.username]))
     return redirect(
         'profile', username=username
     )

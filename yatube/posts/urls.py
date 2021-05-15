@@ -29,6 +29,4 @@ urlpatterns = [
         views.profile_unfollow,
         name='profile_unfollow'
     ),
-    path('404/', views.page_not_found, name='404'),
-    path('500/', views.server_error, name='500'),
 ]

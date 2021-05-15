@@ -5,6 +5,7 @@ from http import HTTPStatus
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
+from django.test.utils import override_settings
 from django.urls import reverse
 
 from ..models import Group, Post, User
@@ -12,12 +13,12 @@ from ..models import Group, Post, User
 
 class PostCreateFormTests(TestCase):
     @classmethod
+    @override_settings(MEDIA_ROOT=tempfile.mkdtemp(dir=settings.BASE_DIR))
     def setUpClass(cls):
         """Временная папка для медиа-файлов.
         Запись в тестовую БД.
         """
         super().setUpClass()
-        settings.MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
         cls.small_gif = (
             b'\x47\x49\x46\x38\x39\x61\x02\x00'
             b'\x01\x00\x80\x00\x00\x00\x00\x00'

@@ -33,7 +33,7 @@ class CacheTestCase(TestCase):
 
     def test_cache_index(self):
         response_1 = self.guest_client.get(reverse('index'))
-        key = make_template_fragment_key('index_page')
+        key = make_template_fragment_key('index_page', [1])
         result = cache.get(key)
         Post.objects.create(
             text='Тест поста №2.',

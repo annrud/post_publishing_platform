@@ -11,9 +11,9 @@ from django.urls import reverse
 from ..models import Group, Post, User
 
 
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp(dir=settings.BASE_DIR))
 class PostCreateFormTests(TestCase):
     @classmethod
-    @override_settings(MEDIA_ROOT=tempfile.mkdtemp(dir=settings.BASE_DIR))
     def setUpClass(cls):
         """Временная папка для медиа-файлов.
         Запись в тестовую БД.
@@ -103,10 +103,11 @@ class PostCreateFormTests(TestCase):
         )
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertEqual(Post.objects.count(), posts_count)
-        self.assertRedirects(response, reverse(
-            'post', kwargs={'username': self.author.username,
-                            'post_id': self.post.id}
-        )
+        self.assertRedirects(
+            response, reverse(
+                'post', kwargs={'username': self.author.username,
+                                'post_id': self.post.id}
+            )
         )
         self.assertTrue(
             Post.objects.filter(

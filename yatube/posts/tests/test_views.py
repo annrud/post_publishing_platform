@@ -8,12 +8,14 @@ from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.paginator import Page
 from django.test import Client, TestCase
+from django.test.utils import override_settings
 from django.urls import reverse
 
 from ..forms import CommentForm, PostForm
 from ..models import Follow, Group, Post, User
 
 
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp(dir=settings.BASE_DIR))
 class PostsPagesTests(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -21,7 +23,6 @@ class PostsPagesTests(TestCase):
         Запись в тестовую БД.
         """
         super().setUpClass()
-        settings.MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
         cls.small_gif = (
             b'\x47\x49\x46\x38\x39\x61\x02\x00'
             b'\x01\x00\x80\x00\x00\x00\x00\x00'

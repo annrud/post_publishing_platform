@@ -16,7 +16,7 @@
         </li>
         <li class="list-group-item">
             <div class="h6 text-muted">
-                Записей: {{ post_count }}
+                Записей: {{ post_author.posts.count }}
             </div>
         </li>
         {% if user.is_authenticated and user.username != post_author.username %}

@@ -17,12 +17,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
-# SECRET_KEY = ')*+@k&)d_*fq95wo3**#tgwf)1-fe=xu8tpp+yxpshna50ndlc'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG', default=False)
 
 ALLOWED_HOSTS = [
+     '*',
     'localhost',
     '127.0.0.1',
     '[::1]',

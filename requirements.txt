@@ -23,5 +23,5 @@ wcwidth==0.1.8            # via pytest
 zipp==2.2.0               # via importlib-metadata
 mixer==7.1.2
 debug_toolbar
-django-environ
 django-debug-toolbar~=3.2.1
+python-dotenv~=0.17.1

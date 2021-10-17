@@ -133,7 +133,3 @@ CACHES = {
 DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': lambda r: False,  # disables it
 }
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static_src'),
-]

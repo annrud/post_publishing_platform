@@ -12,7 +12,7 @@ load_dotenv(os.path.join(BASE_DIR, 'yatube/.env'))
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', default=False)
+DEBUG = False
 
 ALLOWED_HOSTS = [
      '*',
@@ -133,3 +133,7 @@ CACHES = {
 DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': lambda r: False,  # disables it
 }
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static_src'),
+]

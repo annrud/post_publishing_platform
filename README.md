@@ -11,7 +11,9 @@
 - *комментарии к постам*
 - *админка* 
 
-Запуск проекта:
+## Технологии:
+    Python, Django, Django ORM, SQLite, HTML, CSS, Bootstrap
+## Запуск проекта:
 1. Склонируйте репозиторий в рабочую директорию:<br>
 ```git clone https://github.com/annrud/post_publishing_platform.git```
 2. Установите и активируйте виртуальное окружение:<br>
@@ -34,3 +36,7 @@
 ```python manage.py runserver```
 8. Приложение доступно по адресу http://127.0.0.1:8000/ 
 9. Админка сайта доступна на странице http://127.0.0.1:8000/admin
+
+Рендеринг проекта "Yatube" - сайт "Mymountains" - платформа для публикаций постов пользователей о горах
+(размещён на сервере Yandex.Cloud, подключён Nginx, в качестве wsgi-сервера - Gunicorn, БД - PostqteSQL).
+[https://mymountains.tk]
